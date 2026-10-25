@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kucu 🐾 Game Kucing Kita</title>
+    <title>Kucu 🐾 Pawis & Meyku</title>
     <!-- Tailwind CSS & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -22,7 +23,7 @@
             <h1 class="text-2xl font-bold text-pink-500 flex items-center gap-1">
                 🐾 Kucu <span class="text-xs text-pink-300 font-normal">v2.0</span>
             </h1>
-            <p class="text-xs text-pink-400 font-semibold" id="active-user-display">Pemain: Aku 💕</p>
+            <p class="text-xs text-pink-400 font-semibold" id="active-user-display">Pemain: Pawis 🙋‍♂️</p>
         </div>
         <button onclick="toggleUser()" class="bg-pink-100 active:scale-95 transition-transform text-pink-600 px-3 py-1.5 rounded-2xl text-xs font-bold border border-pink-300 flex items-center gap-1">
             🔄 Ganti Pemain
@@ -32,12 +33,12 @@
     <!-- Papan Skor Pasangan -->
     <section class="w-full max-w-md bg-white rounded-3xl p-4 shadow-sm border border-pink-100 mb-4 grid grid-cols-2 gap-2 text-center">
         <div class="bg-pink-50 rounded-2xl p-2 border border-pink-200">
-            <span class="text-xs text-pink-400 block font-semibold">Skor Aku</span>
-            <span class="text-xl font-bold text-pink-600" id="score-aku">0 Pts</span>
+            <span class="text-xs text-pink-400 block font-semibold">Skor Pawis 🙋‍♂️</span>
+            <span class="text-xl font-bold text-pink-600" id="score-pawis">0 Pts</span>
         </div>
         <div class="bg-rose-50 rounded-2xl p-2 border border-rose-200">
-            <span class="text-xs text-rose-400 block font-semibold">Skor Pacar</span>
-            <span class="text-xl font-bold text-rose-600" id="score-pacar">0 Pts</span>
+            <span class="text-xs text-rose-400 block font-semibold">Skor Meyku 🙋‍♀️</span>
+            <span class="text-xl font-bold text-rose-600" id="score-meyku">0 Pts</span>
         </div>
     </section>
 
@@ -84,8 +85,8 @@
     </main>
 
     <script>
-        let currentUser = "Aku";
-        let scores = { "Aku": 0, "Pacar": 0 };
+        let currentUser = "Pawis";
+        let scores = { "Pawis": 0, "Meyku": 0 };
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const statusText = document.getElementById('status-text');
@@ -94,8 +95,8 @@
 
         // Ganti Pemain
         function toggleUser() {
-            currentUser = currentUser === "Aku" ? "Pacar" : "Aku";
-            document.getElementById('active-user-display').innerText = `Pemain: ${currentUser} ${currentUser === "Aku" ? '💕' : '💖'}`;
+            currentUser = currentUser === "Pawis" ? "Meyku" : "Pawis";
+            document.getElementById('active-user-display').innerText = `Pemain: ${currentUser} ${currentUser === "Pawis" ? '🙋‍♂️' : '🙋‍♀️'}`;
         }
 
         // Inisialisasi Kamera
@@ -112,7 +113,7 @@
             }
         }
 
-        // Ambil Foto dan Analisis AI Simulasi (Dapat dihubungkan ke Gemini API Key)
+        // Ambil Foto dan Analisis AI Simulasi
         async function captureAndAnalyze() {
             if (!video.srcObject) {
                 alert("Nyalakan kamera terlebih dahulu ya!");
@@ -129,7 +130,7 @@
             // Tampilkan animasi loading AI
             aiLoading.classList.remove('hidden');
 
-            // Simulasi AI Gemini Menganalisis Foto (Disesuaikan dengan aturan kelangkaan)
+            // Simulasi AI Gemini Menganalisis Foto
             setTimeout(() => {
                 aiLoading.classList.add('hidden');
                 
@@ -146,8 +147,8 @@
                 
                 // Tambah Skor
                 scores[currentUser] += result.pts;
-                document.getElementById('score-aku').innerText = `${scores["Aku"]} Pts`;
-                document.getElementById('score-pacar').innerText = `${scores["Pacar"]} Pts`;
+                document.getElementById('score-pawis').innerText = `${scores["Pawis"]} Pts`;
+                document.getElementById('score-meyku').innerText = `${scores["Meyku"]} Pts`;
 
                 // Reset input catatan
                 document.getElementById('note-input').value = "";
@@ -189,7 +190,7 @@
             const countEl = btn.querySelector('.likes-count');
             countEl.innerText = parseInt(countEl.innerText) + 1;
             btn.classList.add('scale-110');
-                setTimeout(() => btn.classList.remove('scale-110'), 150);
+            setTimeout(() => btn.classList.remove('scale-110'), 150);
         }
 
         window.addEventListener('DOMContentLoaded', initCamera);
