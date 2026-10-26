@@ -99,7 +99,6 @@
     </main>
 
     <script>
-        // URL WEB APP TERBARU KAMU:
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyMx4NLWqHMrQddv1qpZHukaEBxANeE-2O1HGCz0tHzK3me-ldVegS9I2OgRPPOKaLG/exec";
 
         let activePlayer = "Pawis";
@@ -181,26 +180,30 @@
             const result = catTypes[Math.floor(Math.random() * catTypes.length)];
             const noteText = document.getElementById('note-input').value || "Berhasil ditangkap! 🐾";
 
+            const payload = JSON.stringify({
+                action: 'addPhoto',
+                player: activePlayer,
+                image: imageData,
+                label: result.label,
+                pts: result.pts,
+                tag: result.tag,
+                note: noteText
+            });
+
             try {
+                // Trik Pengiriman Data Tanpa Terblokir CORS Browser:
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'addPhoto',
-                        player: activePlayer,
-                        image: imageData,
-                        label: result.label,
-                        pts: result.pts,
-                        tag: result.tag,
-                        note: noteText
-                    })
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: payload
                 });
 
                 document.getElementById('note-input').value = "";
-                setTimeout(fetchCloudData, 2500);
+                // Beri jeda 3 detik untuk pemprosesan di Apps Script lalu refresh data
+                setTimeout(fetchCloudData, 3000);
             } catch (e) {
-                alert("Gagal mengunggah foto ke cloud.");
+                alert("Gagal mengunggah foto ke cloud: " + e.message);
             } finally {
                 aiLoading.classList.add('hidden');
             }
