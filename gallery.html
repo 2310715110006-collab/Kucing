@@ -3,109 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kucu 🐾 Album Galeri</title>
+  <title>Kucu 🐾 Galeri Foto</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Fredoka', cursive, sans-serif; }
-    .cat-gradient { background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #ffdab9 100%); }
+    body { 
+      font-family: 'Fredoka', cursive, sans-serif; 
+      background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #ffdab9 100%);
+    }
   </style>
 </head>
-<body class="cat-gradient min-h-screen text-slate-800 flex flex-col items-center p-4 pb-12">
+<body class="min-h-screen p-4 flex flex-col items-center pb-12">
 
-  <!-- Header App -->
+  <!-- Header Navigasi -->
   <header class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-[2rem] p-4 shadow-lg border-2 border-pink-100 mb-5 flex justify-between items-center">
     <div>
       <h1 class="text-2xl font-bold text-pink-500 flex items-center gap-2">
-        📖 Album Kucu 🐾
+        📸 Galeri Foto Kucu
       </h1>
-      <p class="text-xs text-orange-400 font-semibold mt-0.5">Pawis & Meyku Cat Hunter ☁️</p>
+      <p class="text-xs text-orange-400 font-semibold mt-0.5">Pawis & Meyku Cat Album ☁️</p>
     </div>
-    <a href="index.html" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-extrabold px-3.5 py-2.5 rounded-2xl shadow-md transition-transform active:scale-95">
-      ⬅️ Game
+    <a href="index.html" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-extrabold px-4 py-2.5 rounded-2xl shadow-md transition-transform active:scale-95">
+      ⬅️ Kamera
     </a>
   </header>
 
-  <!-- Container Galeri -->
-  <main class="w-full max-w-md space-y-4" id="galleryContainer">
-    <div id="loadingMsg" class="text-center text-pink-500 font-bold py-8 animate-pulse">
-      Memuat album foto... 🐾
+  <!-- Container Grid Foto -->
+  <main class="w-full max-w-md">
+    <div id="loading" class="text-center text-pink-500 font-bold py-12 animate-pulse">
+      Memuat foto dari Drive... 🐾
     </div>
+    
+    <div id="photoGrid" class="grid grid-cols-2 gap-3 hidden"></div>
   </main>
 
   <script>
+    // URL Web App Deployment Google Apps Script milikmu
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqtjF4VGLBZca5Ir2UYqIHpRb-VqmtndYI6DtwD8FZMd34rrzziDaWzudDY3FHNzxM/exec";
 
     window.onload = function() {
       fetch(GOOGLE_SCRIPT_URL + "?action=getData")
         .then(res => res.json())
         .then(data => {
-          const container = document.getElementById("galleryContainer");
-          container.innerHTML = ""; // Bersihkan loading
+          document.getElementById("loading").style.display = "none";
+          const grid = document.getElementById("photoGrid");
+          grid.classList.remove("hidden");
 
           if (!data.gallery || data.gallery.length === 0) {
-            container.innerHTML = `
-              <div class="bg-white/80 rounded-3xl p-6 text-center text-slate-400 font-semibold border-2 border-pink-100">
-                Belum ada foto kucing yang tersimpan. Yuk jepret dulu! 📸
+            grid.innerHTML = `
+              <div class="col-span-2 bg-white/80 rounded-3xl p-6 text-center text-slate-400 font-semibold border-2 border-pink-100">
+                Belum ada foto. Ambil foto dulu dari kamera! 📸
               </div>
             `;
             return;
           }
 
           data.gallery.forEach(item => {
-            const isPawis = (item.player || "").toLowerCase() === "pawis";
-            const badgeBg = isPawis ? "bg-orange-100 text-orange-600 border-orange-200" : "bg-rose-100 text-rose-600 border-rose-200";
+            if (!item.imgSrc || item.imgSrc === "-") return;
 
-            // Menggunakan thumbnail handler agar gambar Drive 100% pasti kebuka
-            let displayImg = item.imgSrc;
-            if (displayImg && displayImg.includes("drive.google.com") || displayImg.includes("googleusercontent.com")) {
-              const fileId = displayImg.split("/d/")[1] || displayImg.split("id=")[1];
-              if (fileId) {
-                displayImg = `https://lh3.googleusercontent.com/d/${fileId.split("&")[0]}=s600`;
-              }
+            // 1. Ekstrak ID File Google Drive dari URL
+            let rawUrl = item.imgSrc;
+            let fileId = "";
+            
+            if (rawUrl.includes("/d/")) {
+              fileId = rawUrl.split("/d/")[1].split("/")[0].split("?")[0];
+            } else if (rawUrl.includes("id=")) {
+              fileId = rawUrl.split("id=")[1].split("&")[0];
             }
 
-            const card = document.createElement("div");
-            card.className = "bg-white rounded-[2rem] p-4 shadow-lg border-2 border-pink-100 transition-all hover:shadow-xl overflow-hidden";
-            card.innerHTML = `
-              <!-- Foto Kucing -->
-              <div class="w-full aspect-square bg-slate-100 rounded-2xl overflow-hidden mb-3 border border-pink-50">
-                <img src="${displayImg}" 
-                     alt="${item.label}" 
-                     class="w-full h-full object-cover"
-                     loading="lazy"
-                     onerror="this.onerror=null; this.src='https://via.placeholder.com/400x400/ffe4e1/ff4757?text=Foto+Kucu+🐾';">
-              </div>
+            // 2. Jalur Utama CDN Google & Jalur Backup (Fallback)
+            let primarySrc = fileId ? `https://lh3.googleusercontent.com/d/${fileId}=s600` : rawUrl;
+            let fallbackSrc = fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w600` : rawUrl;
 
-              <!-- Header Info -->
-              <div class="flex justify-between items-start mb-2">
-                <span class="text-xs font-black px-3 py-1 rounded-full border ${badgeBg}">
-                  ${item.player} • ${item.tag || '🐾 Biasa'}
-                </span>
-                <span class="text-sm font-black text-emerald-500 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                  +${item.pts} Pts
-                </span>
-              </div>
-              
-              <!-- Nama & Deskripsi -->
-              <h3 class="text-lg font-bold text-slate-800 mt-1">${item.label || 'Kucing'}</h3>
-              
-              <p class="text-xs text-slate-500 font-medium italic mt-1 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                "${item.note || 'Tidak ada catatan.'}"
-              </p>
+            // 3. Render Kartu Foto
+            const card = document.createElement("div");
+            card.className = "bg-white p-2 rounded-2xl shadow-md border-2 border-white aspect-square overflow-hidden flex items-center justify-center relative group";
+            
+            card.innerHTML = `
+              <img src="${primarySrc}" 
+                   alt="Foto Kucu" 
+                   class="w-full h-full object-cover rounded-xl"
+                   loading="lazy"
+                   onerror="if(this.src !== '${fallbackSrc}'){ this.src='${fallbackSrc}'; } else { this.src='https://via.placeholder.com/300?text=Foto+Gagal+Muat'; }">
             `;
-            container.appendChild(card);
+            
+            grid.appendChild(card);
           });
         })
         .catch(err => {
-          console.error("Gagal muat galeri:", err);
-          document.getElementById("galleryContainer").innerHTML = `
-            <div class="text-center text-rose-500 font-bold py-4">
-              Gagal memuat galeri. Pastikan koneksi internet lancar!
-            </div>
-          `;
+          console.error("Gagal muat data:", err);
+          document.getElementById("loading").innerText = "Gagal terhubung ke Google Drive/Sheet.";
         });
     };
   </script>
 </body>
 </html>
+
