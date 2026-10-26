@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kucu 🐾 Pawis & Meyku</title>
+    <!-- Tailwind CSS & Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Fredoka', cursive, sans-serif; }
+        video { object-fit: cover; }
+        .pink-gradient { background: linear-gradient(135deg, #fce7f3 0%, #ffd1dc 100%); }
+        .card-polaroid { background: #ffffff; box-shadow: 0 4px 15px rgba(244, 114, 182, 0.2); }
+    </style>
+</head>
+<body class="pink-gradient min-h-screen text-slate-800 flex flex-col items-center p-4 pb-12">
+
+    <!-- Header & Profil -->
+    <header class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-pink-200 mb-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-pink-500 flex items-center gap-1">
+                🐾 Kucu <span class="text-xs text-pink-300 font-normal">v4.5 Score Fix</span>
+            </h1>
+            <p class="text-xs text-pink-400 font-semibold" id="active-user-display">Pemain: Pawis 🙋‍♂️</p>
+        </div>
+        <button onclick="toggleUser()" class="bg-pink-100 active:scale-95 transition-transform text-pink-600 px-3 py-1.5 rounded-2xl text-xs font-bold border border-pink-300 flex items-center gap-1">
+            🔄 Ganti Pemain
+        </button>
+    </header>
+
+    <!-- Papan Skor Pasangan -->
+    <section class="w-full max-w-md bg-white rounded-3xl p-4 shadow-sm border border-pink-100 mb-4 grid grid-cols-2 gap-2 text-center shadow-sm">
+        <div class="bg-pink-50 rounded-2xl p-2.5 border border-pink-200">
+            <span class="text-xs text-pink-400 block font-semibold">Skor Pawis 🙋‍♂️</span>
+            <span class="text-2xl font-bold text-pink-600" id="score-pawis">0 Pts</span>
+        </div>
+        <div class="bg-rose-50 rounded-2xl p-2.5 border border-rose-200">
+            <span class="text-xs text-rose-400 block font-semibold">Skor Meyku 🙋‍♀️</span>
+            <span class="text-2xl font-bold text-rose-600" id="score-meyku">0 Pts</span>
+        </div>
+    </section>
+
+    <!-- Fitur Manual Share/Receive Foto -->
+    <section class="w-full max-w-md grid grid-cols-2 gap-2 mb-4">
+        <button onclick="exportGallery()" class="bg-emerald-500 active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-2xl shadow-sm flex items-center justify-center gap-1">
+            📤 Kirim Foto
+        </button>
+        <button onclick="importGallery()" class="bg-indigo-500 active:scale-95 text-white text-xs font-bold py-2.5 px-3 rounded-2xl shadow-sm flex items-center justify-center gap-1">
+            📥 Terima Foto
+        </button>
+    </section>
+
+    <!-- Viewport Kamera -->
+    <main class="w-full max-w-md flex-1 flex flex-col items-center">
+        <div class="relative w-full aspect-[4/3] bg-pink-900/10 rounded-3xl overflow-hidden shadow-md border-4 border-white mb-3">
+            <div id="camera-notice" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-0">
+                <p class="text-pink-400 text-sm mb-2" id="status-text">Mencari kamera...</p>
+                <button onclick="initCamera()" class="bg-pink-400 hover:bg-pink-500 text-white text-xs px-4 py-2 rounded-xl shadow">
+                    Nyalakan Kamera 📷
+                </button>
+            </div>
+            
+            <video id="webcam" autoplay playsinline muted class="w-full h-full relative z-10"></video>
+            <canvas id="canvas" class="hidden"></canvas>
+
+            <!-- Overlay Loading AI -->
+            <div id="ai-loading" class="hidden absolute inset-0 bg-white/90 z-20 flex flex-col items-center justify-center p-4 text-center">
+                <div class="animate-bounce text-4xl mb-2">⚡🐱</div>
+                <p class="text-pink-500 font-bold text-sm">Menilai & Sync Skor Real-Time...</p>
+                <p class="text-xs text-slate-400 mt-1">Skor baru langsung dikirim!</p>
+            </div>
+        </div>
+
+        <!-- Catatan Opsional -->
+        <input type="text" id="note-input" placeholder="Tulis catatan lucu/romantis... 💌" class="w-full bg-white/90 border border-pink-200 text-sm rounded-2xl px-4 py-2.5 mb-3 focus:outline-none focus:ring-2 focus:ring-pink-300 text-slate-600">
+
+        <!-- Tombol Foto -->
+        <button onclick="captureAndAnalyze()" class="w-full bg-gradient-to-r from-pink-400 to-rose-400 active:scale-95 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 mb-6">
+            <span class="text-lg">📸 Tangkap Kucing!</span>
+        </button>
+
+        <!-- Galeri Koleksi -->
+        <section class="w-full">
+            <h2 class="text-md font-bold text-pink-600 mb-3 flex items-center gap-1">
+                📖 Galeri Kucu
+            </h2>
+            <div id="gallery" class="grid grid-cols-2 gap-3">
+                <p class="text-pink-300 text-sm col-span-2 text-center py-6 bg-white/40 rounded-2xl border border-dashed border-pink-200">
+                    Belum ada foto tersimpan.<br>Yuk jepret kucing pertama kalian! 🐾
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const CLOUD_SCORE_URL = "https://api.countapi.xyz";
+        const NAMESPACE = "kucu_pawis_meyku_v45_fix";
+
+        let currentUser = "Pawis";
+        let galleryData = JSON.parse(localStorage.getItem('kucu_gallery_v45')) || [];
+
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const statusText = document.getElementById('status-text');
+        const aiLoading = document.getElementById('ai-loading');
+        const gallery = document.getElementById('gallery');
+
+        function toggleUser() {
+            currentUser = currentUser === "Pawis" ? "Meyku" : "Pawis";
+            document.getElementById('active-user-display').innerText = `Pemain: ${currentUser} ${currentUser === "Pawis" ? '🙋‍♂️' : '🙋‍♀️'}`;
+        }
+
+        async function initCamera() {
+            try {
+                statusText.innerText = "Memuat kamera...";
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' }, audio: false 
+                });
+                video.srcObject = stream;
+                statusText.innerText = "Kamera Siap!";
+            } catch (err) {
+                statusText.innerText = "Izin kamera diblokir.";
+            }
+        }
+
+        // 1. TARIK SKOR TERBARU DARI CLOUD
+        async function syncOnlineScores() {
+            try {
+                const resP = await fetch(`${CLOUD_SCORE_URL}/get/${NAMESPACE}/pawis`);
+                const resM = await fetch(`${CLOUD_SCORE_URL}/get/${NAMESPACE}/meyku`);
+
+                if (resP.ok) {
+                    const dataP = await resP.json();
+                    if (dataP.value !== undefined) {
+                        localStorage.setItem('local_score_pawis', dataP.value);
+                    }
+                }
+                if (resM.ok) {
+                    const dataM = await resM.json();
+                    if (dataM.value !== undefined) {
+                        localStorage.setItem('local_score_meyku', dataM.value);
+                    }
+                }
+            } catch (e) {
+                console.log("Sync cloud pending, pakai skor lokal", e);
+            }
+
+            // TAMPILKAN SKOR LOKAL (JAMINAN PASTI MUNCUL)
+            const pVal = localStorage.getItem('local_score_pawis') || 0;
+            const mVal = localStorage.getItem('local_score_meyku') || 0;
+            document.getElementById('score-pawis').innerText = `${pVal} Pts`;
+            document.getElementById('score-meyku').innerText = `${mVal} Pts`;
+        }
+
+        // 2. KIRIM TAMBAHAN POIN KE CLOUD
+        async function updateScoreToCloud(addedPts) {
+            const userKey = currentUser.toLowerCase();
+            
+            // Update lokal seketika
+            let localVal = parseInt(localStorage.getItem(`local_score_${userKey}`) || 0);
+            localVal = Math.max(0, localVal + addedPts);
+            localStorage.setItem(`local_score_${userKey}`, localVal);
+            
+            // Tampilkan di layar langsung
+            document.getElementById(`score-${userKey}`).innerText = `${localVal} Pts`;
+
+            // Kirim penambahan poin ke Cloud
+            try {
+                if (addedPts > 0) {
+                    await fetch(`${CLOUD_SCORE_URL}/update/${NAMESPACE}/${userKey}?amount=${addedPts}`);
+                } else if (addedPts < 0) {
+                    await fetch(`${CLOUD_SCORE_URL}/update/${NAMESPACE}/${userKey}?amount=${addedPts}`);
+                }
+                syncOnlineScores();
+            } catch (e) {
+                console.error("Gagal kirim poin ke cloud, tersimpan secara lokal", e);
+            }
+        }
+
+        function loadGallery() {
+            gallery.innerHTML = '';
+            if (galleryData.length === 0) {
+                gallery.innerHTML = `<p class="text-pink-300 text-sm col-span-2 text-center py-6 bg-white/40 rounded-2xl border border-dashed border-pink-200">Belum ada foto. Yuk tangkap kucing! 🐾</p>`;
+            } else {
+                galleryData.forEach(item => renderCard(item));
+            }
+            syncOnlineScores();
+        }
+
+        async function captureAndAnalyze() {
+            if (!video.srcObject) {
+                alert("Nyalakan kamera terlebih dahulu!");
+                return;
+            }
+
+            const context = canvas.getContext('2d');
+            canvas.width = 240; 
+            canvas.height = 180;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg', 0.3); 
+
+            aiLoading.classList.remove('hidden');
+
+            const catTypes = [
+                { label: "Kucing Kampung", pts: 50, tag: "🐾 Biasa" },
+                { label: "Kucing Oren Barbar", pts: 75, tag: "🍊 Popular" },
+                { label: "Kucing Belang Tiga", pts: 100, tag: "✨ Langka" },
+                { label: "Kucing Ras Anggora", pts: 150, tag: "👑 Mewah" }
+            ];
+            
+            const result = catTypes[Math.floor(Math.random() * catTypes.length)];
+            const noteText = document.getElementById('note-input').value || "Berhasil ditangkap! 🐾";
+
+            const newItem = {
+                id: Date.now(),
+                imgSrc: imageData,
+                player: currentUser,
+                label: result.label,
+                pts: result.pts,
+                tag: result.tag,
+                note: noteText,
+                likes: 0
+            };
+
+            galleryData.unshift(newItem);
+            localStorage.setItem('kucu_gallery_v45', JSON.stringify(galleryData));
+
+            // Tambahkan poin seketika
+            await updateScoreToCloud(result.pts);
+
+            document.getElementById('note-input').value = "";
+            aiLoading.classList.add('hidden');
+            
+            loadGallery();
+        }
+
+        function renderCard(item) {
+            const card = document.createElement('div');
+            card.className = "card-polaroid rounded-2xl p-2.5 border border-pink-100 flex flex-col justify-between";
+            
+            card.innerHTML = `
+                <div>
+                    <div class="relative mb-2">
+                        <img src="${item.imgSrc}" class="w-full aspect-square object-cover rounded-xl">
+                        <span class="absolute top-1.5 right-1.5 bg-white/90 text-pink-600 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                            +${item.pts} Pts
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-bold text-pink-500">${item.tag}</span>
+                        <span class="text-[10px] font-semibold text-slate-400">Oleh: ${item.player}</span>
+                    </div>
+                    <p class="text-xs font-bold text-slate-700 leading-tight mb-1">${item.label}</p>
+                    <p class="text-[11px] text-pink-400 italic mb-2">"${item.note}"</p>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="addHeart(${item.id})" class="flex-1 bg-pink-50 hover:bg-pink-100 text-pink-500 text-xs font-semibold py-1 rounded-xl flex items-center justify-center gap-1 border border-pink-200">
+                        <span>❤️</span> <span>${item.likes || 0}</span>
+                    </button>
+                    <button onclick="deleteCard(${item.id})" class="bg-rose-50 hover:bg-rose-100 text-rose-500 px-2 py-1 rounded-xl border border-rose-200 text-xs" title="Hapus Foto">
+                        🗑️
+                    </button>
+                </div>
+            `;
+            gallery.appendChild(card);
+        }
+
+        function addHeart(id) {
+            const item = galleryData.find(x => x.id === id);
+            if (item) {
+                item.likes = (item.likes || 0) + 1;
+                localStorage.setItem('kucu_gallery_v45', JSON.stringify(galleryData));
+                loadGallery();
+            }
+        }
+
+        async function deleteCard(id) {
+            if (confirm("Hapus foto ini? Poin kamu juga akan berkurang! 🐾")) {
+                const item = galleryData.find(x => x.id === id);
+                if (item) {
+                    await updateScoreToCloud(-item.pts);
+                }
+                galleryData = galleryData.filter(x => x.id !== id);
+                localStorage.setItem('kucu_gallery_v45', JSON.stringify(galleryData));
+                loadGallery();
+            }
+        }
+
+        function exportGallery() {
+            if (galleryData.length === 0) {
+                alert("Belum ada foto untuk dikirim!");
+                return;
+            }
+            const jsonString = JSON.stringify(galleryData);
+            navigator.clipboard.writeText(jsonString).then(() => {
+                alert("Kode foto berhasil disalin! 📋\n\nKirimkan teks ini ke WhatsApp pacar kamu, lalu minta ia tekan '📥 Terima Foto'.");
+            }).catch(() => {
+                prompt("Salin kode foto di bawah ini:", jsonString);
+            });
+        }
+
+        function importGallery() {
+            const inputCode = prompt("Tempelkan (Paste) kode foto dari pacar kamu:");
+            if (!inputCode) return;
+
+            try {
+                const importedData = JSON.parse(inputCode);
+                if (Array.isArray(importedData)) {
+                    const existingIds = new Set(galleryData.map(item => item.id));
+                    let addedCount = 0;
+
+                    importedData.forEach(item => {
+                        if (!existingIds.has(item.id)) {
+                            galleryData.push(item);
+                            addedCount++;
+                        }
+                    });
+
+                    galleryData.sort((a, b) => b.id - a.id);
+                    localStorage.setItem('kucu_gallery_v45', JSON.stringify(galleryData));
+                    loadGallery();
+
+                    alert(`Berhasil menambahkan ${addedCount} foto ke galeri kamu! 🎉`);
+                }
+            } catch (e) {
+                alert("Kode foto tidak valid!");
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initCamera();
+            loadGallery();
+            setInterval(syncOnlineScores, 3000);
+        });
+    </script>
+</body>
+</html>
