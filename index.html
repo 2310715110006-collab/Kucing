@@ -163,25 +163,19 @@
             const uploadUrl = `${GOOGLE_SCRIPT_URL}?action=addPhoto&player=${encodeURIComponent(activePlayer)}&pts=${result.pts}&label=${encodeURIComponent(result.label)}&tag=${encodeURIComponent(result.tag)}&note=${encodeURIComponent(noteText)}`;
 
             try {
-                const response = await fetch(uploadUrl, {
+                await fetch(uploadUrl, {
                     method: 'POST',
-                    mode: 'cors',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: imageData
                 });
 
-                const resData = await response.json();
-
-                if (resData.status === "success") {
-                    document.getElementById('note-input').value = "";
-                    fetchCloudScores();
-                    alert(`Tersimpan! +${result.pts} Pts (${result.label}). Lihat di Album! 📸`);
-                } else {
-                    alert("Gagal: " + resData.message);
-                }
+                document.getElementById('note-input').value = "";
+                setTimeout(fetchCloudScores, 1500);
+                alert(`Tersimpan! +${result.pts} Pts (${result.label}). Cek di Album! 📸`);
             } catch (e) {
                 console.error("Upload Error:", e);
-                alert("Foto terunggah ke Cloud.");
+                alert("Terjadi kendala jaringan saat mengunggah foto.");
             } finally {
                 aiLoading.classList.add('hidden');
             }
