@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kucu 🐾 Pawis & Meyku Cloud</title>
+    <title>Kucu 🐾 Pawis & Meyku</title>
     <!-- Tailwind CSS & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
@@ -20,7 +20,7 @@
     <header class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-pink-200 mb-4 flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-bold text-pink-500 flex items-center gap-1">
-                🐾 Kucu <span class="text-xs text-pink-300 font-normal">v3.0 Cloud</span>
+                🐾 Kucu <span class="text-xs text-pink-300 font-normal">v3.5</span>
             </h1>
             <p class="text-xs text-pink-400 font-semibold" id="active-user-display">Pemain: Pawis 🙋‍♂️</p>
         </div>
@@ -56,9 +56,9 @@
 
             <!-- Overlay Loading AI -->
             <div id="ai-loading" class="hidden absolute inset-0 bg-white/90 z-20 flex flex-col items-center justify-center p-4 text-center">
-                <div class="animate-bounce text-4xl mb-2">☁️🐱</div>
-                <p class="text-pink-500 font-bold text-sm">AI Gemini & Cloud Sync...</p>
-                <p class="text-xs text-slate-400 mt-1">Mengunggah ke Cloud & Menghitung Poin</p>
+                <div class="animate-bounce text-4xl mb-2">🐱✨</div>
+                <p class="text-pink-500 font-bold text-sm">Menilai Kucing & Menyimpan...</p>
+                <p class="text-xs text-slate-400 mt-1">Sabar ya, foto sedang diproses!</p>
             </div>
         </div>
 
@@ -73,22 +73,20 @@
         <!-- Galeri Koleksi -->
         <section class="w-full">
             <h2 class="text-md font-bold text-pink-600 mb-3 flex items-center gap-1">
-                ☁️ Galeri Cloud Kucu Kita
+                📖 Galeri Kucu Kita
             </h2>
             <div id="gallery" class="grid grid-cols-2 gap-3">
                 <p class="text-pink-300 text-sm col-span-2 text-center py-6 bg-white/40 rounded-2xl border border-dashed border-pink-200">
-                    Menghubungkan ke Cloud... 🐾
+                    Belum ada foto kucing tersimpan.<br>Yuk jepret kucing pertama kalian! 🐾
                 </p>
             </div>
         </section>
     </main>
 
     <script>
-        // MASUKKAN URL FIREBASE KAMU DI SINI (Akhiri dengan /)
-        const FIREBASE_URL = "URL_DATABASE_FIREBASE_KAMU_DI_SINI"; 
-
         let currentUser = "Pawis";
         let scores = { "Pawis": 0, "Meyku": 0 };
+        let galleryData = JSON.parse(localStorage.getItem('kucu_gallery_backup')) || [];
 
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
@@ -114,40 +112,22 @@
             }
         }
 
-        // Ambil data dari Cloud Firebase
-        async function fetchCloudData() {
-            if (FIREBASE_URL.includes("URL_DATABASE_FIREBASE_KAMU_DI_SINI")) {
-                gallery.innerHTML = `<p class="text-xs text-rose-500 col-span-2 text-center bg-white p-3 rounded-2xl">Harap masukkan URL Firebase kamu di dalam kode terlebih dahulu!</p>`;
+        function loadGallery() {
+            scores = { "Pawis": 0, "Meyku": 0 };
+            gallery.innerHTML = '';
+
+            if (galleryData.length === 0) {
+                gallery.innerHTML = `<p class="text-pink-300 text-sm col-span-2 text-center py-6 bg-white/40 rounded-2xl border border-dashed border-pink-200">Belum ada foto. Yuk tangkap kucing! 🐾</p>`;
                 return;
             }
 
-            try {
-                const res = await fetch(`${FIREBASE_URL}posts.json`);
-                const data = await res.json();
-                
-                scores = { "Pawis": 0, "Meyku": 0 };
-                gallery.innerHTML = '';
+            galleryData.forEach(item => {
+                scores[item.player] = (scores[item.player] || 0) + item.pts;
+                renderCard(item);
+            });
 
-                if (!data) {
-                    gallery.innerHTML = `<p class="text-pink-300 text-sm col-span-2 text-center py-6 bg-white/40 rounded-2xl border border-dashed border-pink-200">Belum ada foto di Cloud. Yuk jepret kucing pertama! 🐾</p>`;
-                    return;
-                }
-
-                const postsArray = Object.keys(data).map(key => ({ id: key, ...data[key] })).reverse();
-
-                postsArray.forEach(item => {
-                    if (item.player && item.pts) {
-                        scores[item.player] = (scores[item.player] || 0) + item.pts;
-                    }
-                    renderCard(item);
-                });
-
-                document.getElementById('score-pawis').innerText = `${scores["Pawis"] || 0} Pts`;
-                document.getElementById('score-meyku').innerText = `${scores["Meyku"] || 0} Pts`;
-
-            } catch (e) {
-                console.error(e);
-            }
+            document.getElementById('score-pawis').innerText = `${scores["Pawis"] || 0} Pts`;
+            document.getElementById('score-meyku').innerText = `${scores["Meyku"] || 0} Pts`;
         }
 
         async function captureAndAnalyze() {
@@ -157,14 +137,14 @@
             }
 
             const context = canvas.getContext('2d');
-            canvas.width = 320; 
-            canvas.height = 240;
+            canvas.width = 300; 
+            canvas.height = 225;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = canvas.toDataURL('image/jpeg', 0.4); 
 
             aiLoading.classList.remove('hidden');
 
-            setTimeout(async () => {
+            setTimeout(() => {
                 const catTypes = [
                     { label: "Kucing Kampung", pts: 50, tag: "🐾 Biasa" },
                     { label: "Kucing Oren Barbar", pts: 75, tag: "🍊 Popular" },
@@ -176,28 +156,26 @@
                 const noteText = document.getElementById('note-input').value || "Berhasil ditangkap! 🐾";
 
                 const newItem = {
+                    id: Date.now(),
                     imgSrc: imageData,
                     player: currentUser,
                     label: result.label,
                     pts: result.pts,
                     tag: result.tag,
                     note: noteText,
-                    likes: 0,
-                    timestamp: Date.now()
+                    likes: 0
                 };
 
-                // Kirim ke Cloud Firebase
-                await fetch(`${FIREBASE_URL}posts.json`, {
-                    method: 'POST',
-                    body: JSON.stringify(newItem)
-                });
+                galleryData.unshift(newItem);
+                
+                // Simpan ke memori sementara browser agar langsung muncul
+                localStorage.setItem('kucu_gallery_backup', JSON.stringify(galleryData));
 
                 document.getElementById('note-input').value = "";
                 aiLoading.classList.add('hidden');
                 
-                // Refresh data dari Cloud
-                fetchCloudData();
-            }, 1800);
+                loadGallery();
+            }, 1500);
         }
 
         function renderCard(item) {
@@ -219,26 +197,25 @@
                     <p class="text-xs font-bold text-slate-700 leading-tight mb-1">${item.label}</p>
                     <p class="text-[11px] text-pink-400 italic mb-2">"${item.note}"</p>
                 </div>
-                <button onclick="addHeart('${item.id}', ${item.likes || 0})" class="w-full bg-pink-50 hover:bg-pink-100 text-pink-500 text-xs font-semibold py-1 rounded-xl flex items-center justify-center gap-1 border border-pink-200">
+                <button onclick="addHeart(${item.id})" class="w-full bg-pink-50 hover:bg-pink-100 text-pink-500 text-xs font-semibold py-1 rounded-xl flex items-center justify-center gap-1 border border-pink-200">
                     <span>❤️</span> <span>${item.likes || 0}</span>
                 </button>
             `;
             gallery.appendChild(card);
         }
 
-        async function addHeart(id, currentLikes) {
-            await fetch(`${FIREBASE_URL}posts/${id}.json`, {
-                method: 'PATCH',
-                body: JSON.stringify({ likes: currentLikes + 1 })
-            });
-            fetchCloudData();
+        function addHeart(id) {
+            const item = galleryData.find(x => x.id === id);
+            if (item) {
+                item.likes = (item.likes || 0) + 1;
+                localStorage.setItem('kucu_gallery_backup', JSON.stringify(galleryData));
+                loadGallery();
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             initCamera();
-            fetchCloudData();
-            // Otomatis cek pembaruan cloud setiap 5 detik
-            setInterval(fetchCloudData, 5000);
+            loadGallery();
         });
     </script>
 </body>
