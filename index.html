@@ -3,283 +3,444 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🐾 Kucu Score & Gallery</title>
+  <title>Kucu Competition v12.0</title>
   <style>
     :root {
-      --primary: #ff7b9c;
-      --primary-hover: #ff527b;
-      --bg-color: #fff5f7;
-      --card-bg: #ffffff;
-      --text-color: #4a4a4a;
-      --accent: #ffc107;
+      --pink-bg: #fff0f5;
+      --pink-main: #ff69b4;
+      --pink-dark: #d81b60;
+      --pink-soft: #ffe4e1;
+      --green-btn: #2ecc71;
+      --green-hover: #27ae60;
+      --blue-btn: #3498db;
+      --blue-hover: #2980b9;
+      --text-dark: #4a4a4a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--pink-bg);
+      color: var(--text-dark);
       padding: 15px;
-      max-width: 600px;
+      max-width: 450px;
       margin: 0 auto;
     }
 
-    header { text-align: center; margin-bottom: 20px; }
-    header h1 { font-size: 26px; color: #d81b60; }
+    /* HEADER SECTION */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
 
-    .scoreboard { display: flex; gap: 15px; margin-bottom: 20px; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-logo { font-size: 30px; }
+
+    .brand-title h1 {
+      font-size: 24px;
+      color: var(--pink-main);
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    .brand-title span {
+      font-size: 11px;
+      color: #aaa;
+      font-weight: 600;
+    }
+
+    .btn-switch {
+      background: #f7e8f0;
+      border: 1px solid #e0cbd8;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #880e4f;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s;
+    }
+
+    .btn-switch:active { background: #ebd3e3; }
+
+    .player-indicator {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--pink-main);
+      margin-bottom: 14px;
+    }
+
+    /* SCOREBOARD SECTION */
+    .scoreboard {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
     .score-card {
       flex: 1;
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 15px;
+      background: white;
+      border: 2px solid var(--pink-soft);
+      border-radius: 20px;
+      padding: 14px 10px;
       text-align: center;
-      box-shadow: 0 4px 12px rgba(255, 123, 156, 0.2);
-      border: 2px solid #ffe1e8;
+      box-shadow: 0 4px 12px rgba(255, 105, 180, 0.08);
     }
 
-    .score-card h3 { font-size: 18px; margin-bottom: 5px; }
-    .score-card .score { font-size: 32px; font-weight: bold; color: var(--primary-hover); }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-      border: 2px solid #ffe1e8;
-      margin-bottom: 25px;
+    .score-card h3 {
+      font-size: 13px;
+      color: var(--pink-main);
+      margin-bottom: 4px;
     }
 
-    .card h2 { font-size: 18px; margin-bottom: 15px; color: #d81b60; text-align: center; }
-    label { font-weight: bold; display: block; margin-top: 10px; font-size: 13px; }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ffccd5;
-      border-radius: 10px;
-      font-family: inherit;
-      background-color: #fff9fa;
+    .score-card .pts {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--pink-main);
     }
 
-    .btn {
-      width: 100%;
-      padding: 12px;
-      margin-top: 18px;
-      background: var(--primary);
-      color: white;
+    /* ACTION BUTTONS */
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .btn-action {
+      flex: 1;
       border: none;
-      border-radius: 25px;
-      font-size: 16px;
+      border-radius: 14px;
+      padding: 12px 6px;
+      color: white;
+      font-size: 13px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(255, 123, 156, 0.4);
-      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      transition: transform 0.1s, opacity 0.2s;
     }
 
-    .btn:hover { background: var(--primary-hover); }
-    .btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+    .btn-action:active { transform: scale(0.98); }
+    .btn-share { background-color: var(--green-btn); }
+    .btn-share:hover { background-color: var(--green-hover); }
+    .btn-receive { background-color: var(--blue-btn); }
+    .btn-receive:hover { background-color: var(--blue-hover); }
 
-    #preview {
+    /* CAMERA DISPLAY BOX */
+    .camera-box {
+      background: #111;
+      border-radius: 16px;
+      overflow: hidden;
       width: 100%;
-      max-height: 250px;
-      object-fit: cover;
-      margin-top: 15px;
-      border-radius: 12px;
-      display: none;
-      border: 2px dashed var(--primary);
+      height: 280px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border: 2px solid var(--pink-soft);
+      cursor: pointer;
     }
 
-    #status { text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
+    #previewImg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-    .gallery-title { font-size: 20px; color: #d81b60; margin-bottom: 15px; text-align: center; }
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    .camera-placeholder {
+      position: absolute;
+      color: #fff;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .camera-placeholder span {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .camera-placeholder p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    /* INPUT NOTE SECTION */
+    .note-box {
+      background: white;
+      border-radius: 16px;
+      padding: 10px 14px;
+      border: 1.5px solid var(--pink-soft);
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .note-box input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: #444;
+      background: transparent;
+    }
+
+    #statusText {
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      min-height: 18px;
+    }
+
+    /* GALLERY STREAM */
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .gallery-title {
+      font-size: 15px;
+      font-weight: bold;
+      color: var(--pink-dark);
+    }
+
+    .gallery-list {
+      display: flex;
+      flex-direction: column;
       gap: 12px;
     }
 
-    .gallery-item {
-      background: var(--card-bg);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      border: 1px solid #ffe1e8;
+    .gallery-card {
+      background: white;
+      border-radius: 16px;
+      padding: 12px;
+      border: 1.5px solid var(--pink-soft);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
 
-    .gallery-item img { width: 100%; height: 120px; object-fit: cover; }
-    .gallery-info { padding: 8px; font-size: 12px; }
-    .gallery-info .player { font-weight: bold; color: var(--primary-hover); }
-    .gallery-info .pts { float: right; background: var(--accent); padding: 1px 6px; border-radius: 8px; font-weight: bold; }
-    .gallery-info .desc { margin-top: 4px; color: #666; font-size: 11px; }
+    .gallery-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    .gallery-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .gallery-meta .player-tag {
+      color: var(--pink-dark);
+      background: var(--pink-bg);
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+
+    .gallery-meta .pts-tag {
+      color: var(--green-btn);
+    }
+
+    .gallery-note {
+      font-size: 12px;
+      color: #666;
+      margin-top: 6px;
+      word-break: break-word;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>🐾 Kucu Score & Gallery 🐾</h1>
-  </header>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-logo">🐾</div>
+      <div class="brand-title">
+        <h1>Kucu</h1>
+        <span>v12.0 Competition</span>
+      </div>
+    </div>
+    <button class="btn-switch" onclick="togglePlayer()">🔄 Ganti Pemain</button>
+  </div>
 
+  <div class="player-indicator" id="playerDisplay">Pemain: Pawis 💁‍♀️</div>
+
+  <!-- SCOREBOARD -->
   <div class="scoreboard">
     <div class="score-card">
-      <h3>Pawis 🐾</h3>
-      <div class="score" id="scorePawis">0</div>
+      <h3 id="labelPawis">Pawis 🐾</h3>
+      <div class="pts" id="scorePawis">0 Pts</div>
     </div>
     <div class="score-card">
-      <h3>Meyku 🐱</h3>
-      <div class="score" id="scoreMeyku">0</div>
+      <h3 id="labelMeyku">Meyku 🐱</h3>
+      <div class="pts" id="scoreMeyku">0 Pts</div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>📸 Tambah Foto & Poin Kucing</h2>
-
-    <label>Pilih Player:</label>
-    <select id="playerInput">
-      <option value="Pawis">Pawis</option>
-      <option value="Meyku">Meyku</option>
-    </select>
-
-    <label>Poin (+):</label>
-    <input type="number" id="ptsInput" value="10">
-
-    <label>Label Foto:</label>
-    <input type="text" id="labelInput" placeholder="misal: Kucu Lagi Tidur">
-
-    <label>Tag:</label>
-    <input type="text" id="tagInput" placeholder="misal: Cute, Sleep">
-
-    <label>Catatan Singkat:</label>
-    <textarea id="noteInput" placeholder="Tulis cerita singkat..."></textarea>
-
-    <label>Ambil/Pilih Foto Kucing:</label>
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFileSelect(event)">
-    <img id="preview" alt="Preview Foto">
-
-    <button id="uploadBtn" class="btn" onclick="submitData()" disabled>Kirim Foto & Tambah Poin 🚀</button>
-    <p id="status"></p>
+  <!-- ACTION BUTTONS -->
+  <div class="action-buttons">
+    <button class="btn-action btn-share" onclick="triggerCamera()">📷 Bagikan Foto</button>
+    <button class="btn-action btn-receive" onclick="fetchGameData()">📩 Terima Foto</button>
   </div>
 
-  <div class="gallery-title">🖼️ Galeri Kucing Bersama</div>
-  <div class="gallery-grid" id="galleryGrid">
-    <p style="text-align: center; grid-column: 1/-1; color: #888;">Memuat galeri...</p>
+  <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none" onchange="onFileSelected(event)">
+
+  <!-- CAMERA DISPLAY -->
+  <div class="camera-box" onclick="triggerCamera()">
+    <img id="previewImg" src="" alt="" style="display:none;">
+    <div class="camera-placeholder" id="placeholder">
+      <span>📷</span>
+      <p>Ketuk untuk jepret foto kucu</p>
+    </div>
+  </div>
+
+  <!-- NOTE INPUT -->
+  <div class="note-box">
+    <input type="text" id="noteInput" placeholder="Tulis catatan lucu/romantis... 💌">
+  </div>
+
+  <p id="statusText"></p>
+
+  <!-- GALLERY HISTORY -->
+  <div class="gallery-header">
+    <div class="gallery-title">🖼️ Riwayat Foto Galeri</div>
+  </div>
+
+  <div class="gallery-list" id="galleryList">
+    <p style="text-align: center; color: #aaa; font-size: 12px;">Memuat galeri...</p>
   </div>
 
   <script>
-    // MASUKKAN URL WEB APP APPS SCRIPT HASIL DEPLOY DI SINI:
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqtjF4VGLBZca5Ir2UYqIHpRb-VqmtndYI6DtwD8FZMd34rrzziDaWzudDY3FHNzxM/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqtjF4VGLBZca5Ir2UYqIHpRb-VqmtndYI6DtwD8FZMd34rrzziDaWzudDY3FHNzxM/exec";
 
-    let selectedBase64 = "";
+    let currentPlayer = "Pawis";
+    let base64Image = "";
 
-    async function fetchGameData() {
-      try {
-        const response = await fetch(`${SCRIPT_URL}?action=getData`);
-        const data = await response.json();
-
-        document.getElementById('scorePawis').innerText = data.scores.pawis || 0;
-        document.getElementById('scoreMeyku').innerText = data.scores.meyku || 0;
-
-        const grid = document.getElementById('galleryGrid');
-        grid.innerHTML = "";
-
-        if (data.gallery.length === 0) {
-          grid.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #888;">Belum ada foto galeri.</p>';
-          return;
-        }
-
-        data.gallery.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'gallery-item';
-          card.innerHTML = `
-            <img src="${item.imgSrc !== '-' ? item.imgSrc : 'https://via.placeholder.com/150?text=Kucu'}" alt="${item.label}">
-            <div class="gallery-info">
-              <span class="player">${item.player}</span>
-              <span class="pts">+${item.pts}</span>
-              <div style="font-weight:bold; margin-top:3px;">${item.label}</div>
-              <div class="desc">${item.note}</div>
-            </div>
-          `;
-          grid.appendChild(card);
-        });
-
-      } catch (err) {
-        console.error("Gagal mengambil data:", err);
-      }
+    function togglePlayer() {
+      currentPlayer = (currentPlayer === "Pawis") ? "Meyku" : "Pawis";
+      const icon = (currentPlayer === "Pawis") ? "💁‍♀️" : "🙋‍♂️";
+      document.getElementById("playerDisplay").innerText = `Pemain: ${currentPlayer} ${icon}`;
     }
 
-    function handleFileSelect(event) {
+    function triggerCamera() {
+      document.getElementById("fileInput").click();
+    }
+
+    function onFileSelected(event) {
       const file = event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        selectedBase64 = e.target.result;
-        const preview = document.getElementById('preview');
-        preview.src = selectedBase64;
-        preview.style.display = 'block';
-        document.getElementById('uploadBtn').disabled = false;
+        base64Image = e.target.result;
+        const preview = document.getElementById("previewImg");
+        const placeholder = document.getElementById("placeholder");
+        
+        preview.src = base64Image;
+        preview.style.display = "block";
+        placeholder.style.display = "none";
+
+        sendPhoto();
       };
       reader.readAsDataURL(file);
     }
 
-    async function submitData() {
-      const statusText = document.getElementById('status');
-      const uploadBtn = document.getElementById('uploadBtn');
+    async function sendPhoto() {
+      const status = document.getElementById("statusText");
+      const note = document.getElementById("noteInput").value || "Foto Kucu";
 
-      if (!selectedBase64) {
-        alert("Silakan jepret/pilih foto kucing dulu!");
-        return;
-      }
-
-      statusText.innerText = "Mengirim foto & poin...";
-      statusText.style.color = "#007bff";
-      uploadBtn.disabled = true;
+      status.innerText = "⏳ Mengirim foto & memperbarui poin...";
+      status.style.color = "#3498db";
 
       const params = new URLSearchParams({
         action: "addPhoto",
-        player: document.getElementById('playerInput').value,
-        pts: document.getElementById('ptsInput').value,
-        label: document.getElementById('labelInput').value || "Kucing Lucu",
-        tag: document.getElementById('tagInput').value || "General",
-        note: document.getElementById('noteInput').value || "-"
+        player: currentPlayer,
+        pts: 10,
+        label: "Kucu Photo",
+        tag: "Competition",
+        note: note
       });
 
-      const fullUrl = `${SCRIPT_URL}?${params.toString()}`;
-
       try {
-        const response = await fetch(fullUrl, {
+        const res = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
           method: "POST",
           mode: "cors",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: selectedBase64
+          body: base64Image
         });
 
-        const result = await response.json();
-
-        if (result.status === "success") {
-          statusText.innerText = "Berhasil dikirim! 🎉";
-          statusText.style.color = "green";
-          document.getElementById('preview').style.display = 'none';
-          document.getElementById('labelInput').value = "";
-          document.getElementById('noteInput').value = "";
-          selectedBase64 = "";
-
-          setTimeout(fetchGameData, 1000);
+        const data = await res.json();
+        if (data.status === "success") {
+          status.innerText = "🎉 Berhasil Terkirim & Poin Bertambah!";
+          status.style.color = "#2ecc71";
+          document.getElementById("noteInput").value = "";
+          fetchGameData();
         } else {
-          statusText.innerText = "Gagal: " + result.message;
-          statusText.style.color = "red";
-          uploadBtn.disabled = false;
+          status.innerText = "❌ Gagal: " + data.message;
+          status.style.color = "#e74c3c";
         }
       } catch (err) {
-        console.error("Error:", err);
-        statusText.innerText = "Terjadi kesalahan pengiriman.";
-        statusText.style.color = "red";
-        uploadBtn.disabled = false;
+        status.innerText = "❌ Terjadi Kesalahan Koneksi";
+        status.style.color = "#e74c3c";
       }
     }
 
+    async function fetchGameData() {
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getData`);
+        const data = await res.json();
+
+        document.getElementById("scorePawis").innerText = (data.scores.pawis || 0) + " Pts";
+        document.getElementById("scoreMeyku").innerText = (data.scores.meyku || 0) + " Pts";
+
+        const list = document.getElementById("galleryList");
+        list.innerHTML = "";
+
+        if (data.gallery && data.gallery.length > 0) {
+          data.gallery.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "gallery-card";
+            card.innerHTML = `
+              <img src="${item.imgSrc !== '-' ? item.imgSrc : 'https://via.placeholder.com/300?text=Foto+Kucu'}" alt="Foto">
+              <div class="gallery-meta">
+                <span class="player-tag">${item.player}</span>
+                <span class="pts-tag">+${item.pts} Pts</span>
+              </div>
+              <div class="gallery-note">${item.note}</div>
+            `;
+            list.appendChild(card);
+          });
+        } else {
+          list.innerHTML = '<p style="text-align: center; color: #aaa; font-size: 12px;">Belum ada foto di galeri.</p>';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Load data awal
     fetchGameData();
   </script>
 </body>
