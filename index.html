@@ -40,6 +40,19 @@
         </div>
     </section>
 
+    <!-- SELEKSI PEMAIN (KEMBALI KE SEMULA) -->
+    <section class="w-full max-w-md bg-white/90 rounded-2xl p-3 shadow-sm border border-pink-200 mb-4">
+        <label class="block text-xs font-bold text-pink-500 mb-2 text-center">Pilih Pemain Saat Ini:</label>
+        <div class="grid grid-cols-2 gap-2">
+            <button id="btn-player-pawis" onclick="selectPlayer('Pawis')" class="py-2 rounded-xl text-xs font-bold border-2 transition-all bg-pink-500 text-white border-pink-500 shadow-sm">
+                Pawis 🙋‍♂️
+            </button>
+            <button id="btn-player-meyku" onclick="selectPlayer('Meyku')" class="py-2 rounded-xl text-xs font-bold border-2 transition-all bg-white text-rose-400 border-rose-200 hover:bg-rose-50">
+                Meyku 🙋‍♀️
+            </button>
+        </div>
+    </section>
+
     <!-- Viewport Kamera -->
     <main class="w-full max-w-md flex-1 flex flex-col items-center">
         <div class="relative w-full aspect-[4/3] bg-pink-900/10 rounded-3xl overflow-hidden shadow-md border-4 border-white mb-3">
@@ -62,17 +75,11 @@
 
         <input type="text" id="note-input" placeholder="Tulis catatan lucu/romantis... 💌" class="w-full bg-white/90 border border-pink-200 text-sm rounded-2xl px-4 py-2.5 mb-3 focus:outline-none focus:ring-2 focus:ring-pink-300 text-slate-600">
 
-        <!-- Tombol Foto Langsung Pilih Pemain -->
-        <div class="w-full grid grid-cols-2 gap-2 mb-2">
-            <button onclick="captureFor('Pawis')" class="bg-gradient-to-r from-pink-500 to-pink-400 active:scale-95 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all flex flex-col items-center justify-center">
-                <span class="text-sm">📸 Tangkap Sebagai</span>
-                <span class="text-xs opacity-90">Pawis 🙋‍♂️</span>
-            </button>
-            <button onclick="captureFor('Meyku')" class="bg-gradient-to-r from-rose-500 to-rose-400 active:scale-95 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all flex flex-col items-center justify-center">
-                <span class="text-sm">📸 Tangkap Sebagai</span>
-                <span class="text-xs opacity-90">Meyku 🙋‍♀️</span>
-            </button>
-        </div>
+        <!-- Tombol Foto Tunggal -->
+        <button onclick="captureCat()" class="w-full bg-gradient-to-r from-pink-500 to-rose-400 active:scale-95 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 mb-2">
+            <span class="text-lg">📸</span>
+            <span class="text-sm">Tangkap Kucing Cloud</span>
+        </button>
 
         <label class="w-full bg-white hover:bg-pink-50 active:scale-95 text-pink-500 border border-pink-300 font-bold py-2.5 rounded-2xl shadow-sm text-center text-xs cursor-pointer mb-6 block">
             📁 Atau Unggah dari HP
@@ -92,14 +99,29 @@
     </main>
 
     <script>
-        // WEB APP URL TERHUBUNG OTOMATIS:
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw5VHMR47_ZRGFDlDV2GBOUC3bl4LWOvdumdssc5UdqjLeIdDBlrXqc0GkrEhk8zTtS/exec";
+
+        let activePlayer = "Pawis"; // Default pemain awal
 
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const statusText = document.getElementById('status-text');
         const aiLoading = document.getElementById('ai-loading');
         const gallery = document.getElementById('gallery');
+
+        function selectPlayer(player) {
+            activePlayer = player;
+            const btnPawis = document.getElementById('btn-player-pawis');
+            const btnMeyku = document.getElementById('btn-player-meyku');
+
+            if (player === 'Pawis') {
+                btnPawis.className = "py-2 rounded-xl text-xs font-bold border-2 transition-all bg-pink-500 text-white border-pink-500 shadow-sm";
+                btnMeyku.className = "py-2 rounded-xl text-xs font-bold border-2 transition-all bg-white text-rose-400 border-rose-200 hover:bg-rose-50";
+            } else {
+                btnMeyku.className = "py-2 rounded-xl text-xs font-bold border-2 transition-all bg-rose-500 text-white border-rose-500 shadow-sm";
+                btnPawis.className = "py-2 rounded-xl text-xs font-bold border-2 transition-all bg-white text-pink-400 border-pink-200 hover:bg-pink-50";
+            }
+        }
 
         async function fetchCloudData() {
             if (!GOOGLE_SCRIPT_URL) return;
@@ -145,7 +167,7 @@
             }
         }
 
-        async function processCatPhoto(imageData, player) {
+        async function processCatPhoto(imageData) {
             aiLoading.classList.remove('hidden');
 
             const catTypes = [
@@ -165,7 +187,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: 'addPhoto',
-                        player: player,
+                        player: activePlayer,
                         image: imageData,
                         label: result.label,
                         pts: result.pts,
@@ -196,7 +218,7 @@
             }
         }
 
-        async function captureFor(player) {
+        async function captureCat() {
             if (!video.srcObject) {
                 alert("Kamera browser belum aktif. Silakan gunakan tombol '📁 Atau Unggah dari HP' di bawah!");
                 return;
@@ -208,14 +230,12 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = canvas.toDataURL('image/jpeg', 0.4); 
 
-            processCatPhoto(imageData, player);
+            processCatPhoto(imageData);
         }
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            const player = confirm("Unggah foto ini sebagai Pawis? Klik 'OK' untuk Pawis, 'Cancel' untuk Meyku.") ? "Pawis" : "Meyku";
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -226,7 +246,7 @@
                     canvas.height = 225;
                     context.drawImage(img, 0, 0, canvas.width, canvas.height);
                     const imageData = canvas.toDataURL('image/jpeg', 0.4);
-                    processCatPhoto(imageData, player);
+                    processCatPhoto(imageData);
                 };
                 img.src = e.target.result;
             };
