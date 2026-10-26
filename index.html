@@ -19,7 +19,7 @@
     <header class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-pink-200 mb-4 flex justify-between items-center">
         <div>
             <h1 class="text-2xl font-bold text-pink-500 flex items-center gap-1">
-                🐾 Kucu <span class="text-xs text-pink-300 font-normal">v10.0 Online</span>
+                🐾 Kucu <span class="text-xs text-pink-300 font-normal">v11.0 Fixed</span>
             </h1>
             <p class="text-xs text-pink-400 font-semibold">Game Online Pawis & Meyku ☁️</p>
         </div>
@@ -102,7 +102,6 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqtjF4VGLBZca5Ir2UYqIHpRb-VqmtndYI6DtwD8FZMd34rrzziDaWzudDY3FHNzxM/exec";
 
         let activePlayer = "Pawis";
-        let currentScores = { pawis: 0, meyku: 0 };
 
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
@@ -130,11 +129,8 @@
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getData`);
                 if (res.ok) {
                     const data = await res.json();
-                    currentScores.pawis = data.scores.pawis || 0;
-                    currentScores.meyku = data.scores.meyku || 0;
-                    
-                    document.getElementById('score-pawis').innerText = `${currentScores.pawis} Pts`;
-                    document.getElementById('score-meyku').innerText = `${currentScores.meyku} Pts`;
+                    document.getElementById('score-pawis').innerText = `${data.scores.pawis || 0} Pts`;
+                    document.getElementById('score-meyku').innerText = `${data.scores.meyku || 0} Pts`;
                     renderGallery(data.gallery);
                 }
             } catch (e) {
@@ -184,34 +180,19 @@
             const result = catTypes[Math.floor(Math.random() * catTypes.length)];
             const noteText = document.getElementById('note-input').value || "Berhasil ditangkap! 🐾";
 
-            // Hitung akumulasi poin di Frontend
-            let targetKey = activePlayer.toLowerCase();
-            let newTotal = (currentScores[targetKey] || 0) + result.pts;
-            currentScores[targetKey] = newTotal;
-
-            // Update Tampilan HP Secara Instan
-            document.getElementById(`score-${targetKey}`).innerText = `${newTotal} Pts`;
-
-            const payloadData = {
-                action: 'addPhoto',
-                player: activePlayer,
-                newTotalScore: newTotal,
-                image: imageData,
-                label: result.label,
-                pts: result.pts,
-                tag: result.tag,
-                note: noteText
-            };
+            // Mengirim parameter poin & player langsung via URL (kebal dari kendala CORS)
+            const uploadUrl = `${GOOGLE_SCRIPT_URL}?action=addPhoto&player=${encodeURIComponent(activePlayer)}&pts=${result.pts}&label=${encodeURIComponent(result.label)}&tag=${encodeURIComponent(result.tag)}&note=${encodeURIComponent(noteText)}`;
 
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
+                await fetch(uploadUrl, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify(payloadData)
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: imageData
                 });
 
                 document.getElementById('note-input').value = "";
-                setTimeout(fetchCloudData, 3000);
+                setTimeout(fetchCloudData, 3500);
             } catch (e) {
                 alert("Gagal mengunggah foto ke cloud.");
             } finally {
