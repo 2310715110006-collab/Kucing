@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kucu 🐾 Real-time Cloud Game & Album</title>
+    <title>Kucu 🐾 Game & Camera</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Fredoka', cursive, sans-serif; }
         video { object-fit: cover; }
         .cat-gradient { background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #ffdab9 100%); }
-        .card-polaroid { background: #ffffff; box-shadow: 0 8px 25px rgba(244, 114, 182, 0.15); transition: transform 0.3s; }
-        .card-polaroid:hover { transform: translateY(-4px) rotate(1deg); }
-
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-6px); }
@@ -36,30 +33,26 @@
         <span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span>
     </div>
 
-    <!-- Header App -->
+    <!-- Header App & Navigasi ke Gallery -->
     <header class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-[2rem] p-4 shadow-lg border-2 border-pink-100 mb-5 flex justify-between items-center float-anim">
         <div>
             <h1 class="text-3xl font-bold text-pink-500 flex items-center gap-2">
-                <span class="wag-anim">🐱</span> Kucu 
+                <span class="wag-anim">🐱</span> Kucu
             </h1>
-            <p class="text-xs text-orange-400 font-semibold mt-1">Pawis & Meyku Cat Hunter ☁️</p>
+            <p class="text-xs text-orange-400 font-semibold mt-0.5">Pawis & Meyku Cat Hunter ☁️</p>
         </div>
-        <div class="flex flex-col items-end gap-1">
-            <div class="flex items-center gap-1.5 bg-emerald-100 text-emerald-600 px-3 py-1.5 rounded-2xl text-[10px] font-extrabold tracking-wide uppercase shadow-sm">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping absolute opacity-75"></span>
-                <span class="w-2 h-2 rounded-full bg-emerald-500 relative"></span> Live Sync
-            </div>
-            <span class="text-[9px] text-slate-400 font-bold">v12.0 2-Tab Engine</span>
-        </div>
+        <a href="gallery.html" class="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-extrabold px-3.5 py-2.5 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center gap-1.5">
+            📖 Album 🐾
+        </a>
     </header>
 
     <!-- PAPAN SKOR REALTIME (Tab 1: Scores) -->
     <section class="w-full max-w-md bg-white rounded-[2rem] p-4 shadow-xl border-4 border-white mb-5 grid grid-cols-2 gap-4 text-center relative overflow-hidden">
-        <div class="bg-gradient-to-b from-orange-50 to-pink-50 rounded-3xl p-3 border-2 border-orange-100 shadow-sm relative z-10 transition-transform active:scale-95">
+        <div class="bg-gradient-to-b from-orange-50 to-pink-50 rounded-3xl p-3 border-2 border-orange-100 shadow-sm relative z-10">
             <span class="text-xs text-orange-500 block font-extrabold uppercase tracking-wide mb-1">Pawis 😼</span>
             <span class="text-3xl font-black text-orange-500 drop-shadow-sm" id="score-pawis">0 <span class="text-sm font-bold text-orange-300">Pts</span></span>
         </div>
-        <div class="bg-gradient-to-b from-rose-50 to-pink-50 rounded-3xl p-3 border-2 border-rose-100 shadow-sm relative z-10 transition-transform active:scale-95">
+        <div class="bg-gradient-to-b from-rose-50 to-pink-50 rounded-3xl p-3 border-2 border-rose-100 shadow-sm relative z-10">
             <span class="text-xs text-rose-500 block font-extrabold uppercase tracking-wide mb-1">Meyku 😻</span>
             <span class="text-3xl font-black text-rose-500 drop-shadow-sm" id="score-meyku">0 <span class="text-sm font-bold text-rose-300">Pts</span></span>
         </div>
@@ -111,47 +104,20 @@
             <span class="text-base tracking-wide uppercase">Jepret Kucing!</span>
         </button>
 
-        <label class="w-full bg-white/60 backdrop-blur hover:bg-white active:scale-95 text-pink-500 border-2 border-dashed border-pink-300 font-extrabold py-3 rounded-[2rem] text-center text-xs cursor-pointer mb-8 block transition-all">
+        <label class="w-full bg-white/60 backdrop-blur hover:bg-white active:scale-95 text-pink-500 border-2 border-dashed border-pink-300 font-extrabold py-3 rounded-[2rem] text-center text-xs cursor-pointer mb-4 block transition-all">
             📁 Pilih Foto dari Galeri HP
             <input type="file" accept="image/*" capture="environment" id="file-input" class="hidden" onchange="handleFileUpload(event)">
         </label>
-
-        <!-- KOLEKSI ALBUM FOTO KUCING (Tab 2: Gallery) -->
-        <section class="w-full bg-white/50 rounded-[2.5rem] p-5 border-2 border-white backdrop-blur-md shadow-lg">
-            <div class="flex flex-col gap-3 mb-5">
-                <h2 class="text-xl font-black text-pink-600 flex items-center justify-center gap-2">
-                    📖 Album Kucu Kita <span class="text-xs font-bold bg-pink-200 text-pink-700 px-2.5 py-0.5 rounded-full" id="total-cats">0 Foto</span>
-                </h2>
-                
-                <!-- Filter Tab Pemain -->
-                <div class="flex justify-center gap-2 bg-pink-100/60 p-1.5 rounded-2xl">
-                    <button onclick="filterGallery('all')" id="filter-all" class="flex-1 py-1.5 rounded-xl text-xs font-black transition-all bg-white text-pink-500 shadow-sm">Semua</button>
-                    <button onclick="filterGallery('Pawis')" id="filter-pawis" class="flex-1 py-1.5 rounded-xl text-xs font-black transition-all text-slate-500">Pawis 😼</button>
-                    <button onclick="filterGallery('Meyku')" id="filter-meyku" class="flex-1 py-1.5 rounded-xl text-xs font-black transition-all text-slate-500">Meyku 😻</button>
-                </div>
-            </div>
-
-            <div id="gallery" class="grid grid-cols-2 gap-4">
-                <div class="col-span-2 text-center py-10 bg-white/60 rounded-3xl border-2 border-dashed border-pink-200">
-                    <div class="text-4xl mb-2 opacity-50 float-anim">🧶</div>
-                    <p class="text-pink-400 text-sm font-bold">Album masih kosong.<br>Ayo mulai berburu! 🐾</p>
-                </div>
-            </div>
-        </section>
     </main>
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqtjF4VGLBZca5Ir2UYqIHpRb-VqmtndYI6DtwD8FZMd34rrzziDaWzudDY3FHNzxM/exec";
 
         let activePlayer = "Pawis";
-        let rawGalleryData = [];
-        let currentFilter = "all";
-
         const video = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
         const statusText = document.getElementById('status-text');
         const aiLoading = document.getElementById('ai-loading');
-        const gallery = document.getElementById('gallery');
 
         function selectPlayer(player) {
             activePlayer = player;
@@ -167,7 +133,7 @@
             }
         }
 
-        async function fetchCloudData() {
+        async function fetchCloudScores() {
             if (!GOOGLE_SCRIPT_URL) return;
             try {
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getData`);
@@ -175,69 +141,9 @@
                     const data = await res.json();
                     document.getElementById('score-pawis').innerHTML = `${data.scores.pawis || 0} <span class="text-sm font-bold text-orange-300">Pts</span>`;
                     document.getElementById('score-meyku').innerHTML = `${data.scores.meyku || 0} <span class="text-sm font-bold text-rose-300">Pts</span>`;
-                    
-                    rawGalleryData = data.gallery || [];
-                    document.getElementById('total-cats').innerText = `${rawGalleryData.length} Foto`;
-                    renderGallery();
                 }
             } catch (e) {
-                console.log("Syncing...", e);
-            }
-        }
-
-        function filterGallery(player) {
-            currentFilter = player;
-            ['all', 'pawis', 'meyku'].forEach(f => {
-                const btn = document.getElementById(`filter-${f}`);
-                if (f === player.toLowerCase()) {
-                    btn.className = "flex-1 py-1.5 rounded-xl text-xs font-black transition-all bg-white text-pink-500 shadow-sm";
-                } else {
-                    btn.className = "flex-1 py-1.5 rounded-xl text-xs font-black transition-all text-slate-500";
-                }
-            });
-            renderGallery();
-        }
-
-        function renderGallery() {
-            gallery.innerHTML = '';
-            
-            const filtered = rawGalleryData.filter(item => {
-                if (currentFilter === 'all') return true;
-                return item.player.toLowerCase() === currentFilter.toLowerCase();
-            });
-
-            if (filtered.length === 0) {
-                gallery.innerHTML = `<div class="col-span-2 text-center py-10 bg-white/60 rounded-3xl border-2 border-dashed border-pink-200">
-                    <div class="text-4xl mb-2 opacity-50 float-anim">🧶</div>
-                    <p class="text-pink-400 text-sm font-bold">Belum ada foto dalam kategori ini. 🐾</p>
-                </div>`;
-            } else {
-                filtered.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = "card-polaroid rounded-[1.5rem] p-3 border-2 border-white flex flex-col justify-between relative overflow-hidden";
-                    
-                    const playerIcon = item.player.toLowerCase() === 'pawis' ? '😼' : '😻';
-                    const playerColor = item.player.toLowerCase() === 'pawis' ? 'text-orange-500' : 'text-rose-500';
-                    const badgeBg = item.player.toLowerCase() === 'pawis' ? 'bg-orange-100 text-orange-600' : 'bg-rose-100 text-rose-600';
-
-                    card.innerHTML = `
-                        <div class="relative z-10">
-                            <div class="relative mb-2">
-                                <img src="${item.imgSrc !== '-' ? item.imgSrc : 'https://via.placeholder.com/150?text=Kucu'}" class="w-full aspect-square object-cover rounded-2xl bg-pink-100 shadow-inner" loading="lazy">
-                                <span class="absolute -bottom-2 -right-1 bg-gradient-to-r from-emerald-400 to-emerald-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md border-2 border-white">
-                                    +${item.pts} Pts
-                                </span>
-                            </div>
-                            <div class="flex justify-between items-center mb-1 mt-2">
-                                <span class="bg-pink-100 text-pink-600 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${item.tag}</span>
-                                <span class="${badgeBg} text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">${playerIcon} ${item.player}</span>
-                            </div>
-                            <p class="text-xs font-black text-slate-800 leading-snug mt-1">${item.label}</p>
-                            <p class="text-[10px] font-semibold text-slate-500 mt-1 border-l-2 border-pink-200 pl-1.5 italic">"${item.note}"</p>
-                        </div>
-                    `;
-                    gallery.appendChild(card);
-                });
+                console.log("Syncing score...", e);
             }
         }
 
@@ -268,13 +174,14 @@
 
                 if (resData.status === "success") {
                     document.getElementById('note-input').value = "";
-                    fetchCloudData();
+                    fetchCloudScores();
+                    alert(`Tersimpan! +${result.pts} Pts (${result.label}). Lihat di Album! 📸`);
                 } else {
                     alert("Gagal: " + resData.message);
                 }
             } catch (e) {
                 console.error("Upload Error:", e);
-                alert("Foto tersimpan ke galeri lokal (Cloud terhubung).");
+                alert("Foto terunggah ke Cloud.");
             } finally {
                 aiLoading.classList.add('hidden');
             }
@@ -290,13 +197,13 @@
                 statusText.innerText = "Kamera Siap!";
                 document.getElementById('camera-notice').style.display = 'none';
             } catch (err) {
-                statusText.innerText = "Kamera terblokir. Gunakan tombol Upload!";
+                statusText.innerText = "Kamera terblokir. Gunakan Upload!";
             }
         }
 
         function captureCat() {
             if (!video.srcObject) {
-                alert("Nyalakan kamera atau pakai tombol Pilih Foto Galeri di bawah! 🐾");
+                alert("Nyalakan kamera atau pakai Upload dari Galeri HP!");
                 return;
             }
 
@@ -341,8 +248,8 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             initCamera();
-            fetchCloudData();
-            setInterval(fetchCloudData, 4000);
+            fetchCloudScores();
+            setInterval(fetchCloudScores, 4000);
         });
     </script>
 </body>
