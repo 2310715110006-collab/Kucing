@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kucu 🐾 Album Galeri Kucing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Fredoka', cursive, sans-serif; }
+        .cat-gradient { background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 50%, #ffdab9 100%); }
+        .card-polaroid { background: #ffffff; box-shadow: 0 8px 25px rgba(244, 114, 182, 0.15); transition: transform 0.3s; }
+        .card-polaroid:hover { transform: translateY(-4px) rotate(1deg); }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="cat-gradient min-h-screen text-slate-800 flex flex-col items-center p-4 pb-12">
+
+    <!-- Pattern Background -->
+    <div class="fixed inset-0 pointer-events-none opacity-5 text-6xl flex justify-around flex-wrap content-around z-[-1]">
+        <span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span>
+    </div>
+
+    <!-- Header Galeri & Navigasi Kembali ke Kamera -->
+    <header class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-[2rem] p-4 shadow-lg border-2 border-pink-100 mb-5 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-pink-500 flex items-center gap-2">
+                📖 Album Kucu
+            </h1>
+            <p class="text-xs text-orange-400 font-semibold mt-0.5">Koleksi Pawis & Meyku ☁️</p>
+        </div>
+        <a href="index.html" class="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-extrabold px-3.5 py-2.5 rounded-2xl shadow-md transition-transform active:scale-95 flex items-center gap-1.5">
+            📸 Kamera
+        </a>
+    </header>
+
+    <!-- Kontainer Utama Galeri -->
+    <main class="w-full max-w-md flex-1">
+        <section class="w-full bg-white/60 rounded-[2.5rem] p-5 border-2 border-white backdrop-blur-md shadow-lg">
+            
+            <!-- Ringkasan & Filter -->
+            <div class="flex flex-col gap-3 mb-5">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-sm font-black text-pink-600">Total Tangkapan:</span>
+                    <span class="text-xs font-extrabold bg-pink-200 text-pink-700 px-3 py-1 rounded-full" id="total-cats">0 Foto</span>
+                </div>
+                
+                <!-- Filter Berdasarkan Pemain -->
+                <div class="flex justify-center gap-2 bg-pink-100/60 p-1.5 rounded-2xl">
+                    <button onclick="filterGallery('all')" id="filter-all" class="flex-1 py-2 rounded-xl text-xs font-black transition-all bg-white text-pink-500 shadow-sm">Semua</button>
+                    <button onclick="filterGallery('Pawis')" id="filter-pawis" class="flex-1 py-2 rounded-xl text-xs font-black transition-all text-slate-500">Pawis 😼</button>
+                    <button onclick="filterGallery('Meyku')" id="filter-meyku" class="flex-1 py-2 rounded-xl text-xs font-black transition-all text-slate-500">Meyku 😻</button>
+                </div>
+            </div>
+
+            <!-- Grid Album Foto -->
+            <div id="gallery-container" class="grid grid-cols-2 gap-4">
+                <div class="col-span-2 text-center py-12 bg-white/60 rounded-3xl border-2 border-dashed border-pink-200">
+                    <div class="text-4xl mb-2 opacity-50 float-anim">🧶</div>
+                    <p class="text-pink-400 text-sm font-bold">Memuat koleksi foto cloud... 🐾</p>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqtjF4VGLBZca5Ir2UYqIHpRb-VqmtndYI6DtwD8FZMd34rrzziDaWzudDY3FHNzxM/exec";
+
+        let rawGalleryData = [];
+        let currentFilter = "all";
+
+        async function loadGalleryData() {
+            try {
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getData`);
+                if (res.ok) {
+                    const data = await res.json();
+                    rawGalleryData = data.gallery || [];
+                    document.getElementById('total-cats').innerText = `${rawGalleryData.length} Foto`;
+                    renderGallery();
+                }
+            } catch (e) {
+                console.error("Gagal memuat galeri:", e);
+            }
+        }
+
+        function filterGallery(player) {
+            currentFilter = player;
+            ['all', 'pawis', 'meyku'].forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (f === player.toLowerCase()) {
+                    btn.className = "flex-1 py-2 rounded-xl text-xs font-black transition-all bg-white text-pink-500 shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-2 rounded-xl text-xs font-black transition-all text-slate-500";
+                }
+            });
+            renderGallery();
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '';
+            
+            const filtered = rawGalleryData.filter(item => {
+                if (currentFilter === 'all') return true;
+                return item.player.toLowerCase() === currentFilter.toLowerCase();
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center py-12 bg-white/60 rounded-3xl border-2 border-dashed border-pink-200">
+                    <div class="text-4xl mb-2 opacity-50">🧶</div>
+                    <p class="text-pink-400 text-sm font-bold">Belum ada foto dalam kategori ini. 🐾</p>
+                </div>`;
+            } else {
+                filtered.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = "card-polaroid rounded-[1.5rem] p-3 border-2 border-white flex flex-col justify-between relative overflow-hidden";
+                    
+                    const playerIcon = item.player.toLowerCase() === 'pawis' ? '😼' : '😻';
+                    const badgeBg = item.player.toLowerCase() === 'pawis' ? 'bg-orange-100 text-orange-600' : 'bg-rose-100 text-rose-600';
+
+                    card.innerHTML = `
+                        <div class="relative z-10">
+                            <div class="relative mb-2">
+                                <img src="${item.imgSrc !== '-' ? item.imgSrc : 'https://via.placeholder.com/150?text=Kucu'}" class="w-full aspect-square object-cover rounded-2xl bg-pink-100 shadow-inner" loading="lazy">
+                                <span class="absolute -bottom-2 -right-1 bg-gradient-to-r from-emerald-400 to-emerald-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md border-2 border-white">
+                                    +${item.pts} Pts
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center mb-1 mt-2">
+                                <span class="bg-pink-100 text-pink-600 text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">${item.tag}</span>
+                                <span class="${badgeBg} text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase">${playerIcon} ${item.player}</span>
+                            </div>
+                            <p class="text-xs font-black text-slate-800 leading-snug mt-1">${item.label}</p>
+                            <p class="text-[10px] font-semibold text-slate-500 mt-1 border-l-2 border-pink-200 pl-1.5 italic">"${item.note}"</p>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadGalleryData);
+    </script>
+</body>
+</html>
