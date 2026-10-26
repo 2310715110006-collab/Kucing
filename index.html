@@ -40,29 +40,16 @@
             width: 0; height: 0;
             border-left: 20px solid transparent;
             border-right: 20px solid transparent;
-            border-bottom: 30px solid #fbcfe8; /* Pink-200 */
-            z-index: -1;
+            border-bottom: 30px solid #fbcfe8;
+            z-index: 0;
         }
         .cat-ears-container::before { left: 20px; transform: rotate(-15deg); }
         .cat-ears-container::after { right: 20px; transform: rotate(15deg); }
     </style>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kucu Score & Gallery</title>
-  <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; max-width: 500px; margin: 0 auto; background: #f9f9f9; }
-    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    label { font-weight: bold; display: block; margin-top: 10px; font-size: 14px; }
-    input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
-    button { width: 100%; padding: 12px; margin-top: 15px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
-    button:disabled { background: #aaa; }
-    #preview { max-width: 100%; height: auto; margin-top: 10px; border-radius: 8px; display: none; }
-    #status { font-weight: bold; text-align: center; margin-top: 10px; }
-  </style>
 </head>
 <body class="cat-gradient min-h-screen text-slate-800 flex flex-col items-center p-4 pb-12 overflow-x-hidden">
 
-    <!-- Latar Belakang Dekoratif (Jejak Kaki Samars) -->
+    <!-- Latar Belakang Dekoratif -->
     <div class="fixed inset-0 pointer-events-none opacity-5 text-6xl flex justify-around flex-wrap content-around z-[-1]">
         <span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span><span>🐾</span>
     </div>
@@ -86,7 +73,6 @@
 
     <!-- PAPAN SKOR REALTIME -->
     <section class="w-full max-w-md bg-white rounded-[2rem] p-4 shadow-xl border-4 border-white mb-5 grid grid-cols-2 gap-4 text-center relative overflow-hidden">
-        <!-- Hiasan latar skor -->
         <div class="absolute -right-4 -bottom-4 text-pink-50 text-7xl opacity-50 pointer-events-none transform -rotate-12">🐟</div>
         
         <div class="bg-gradient-to-b from-orange-50 to-pink-50 rounded-3xl p-3 border-2 border-orange-100 shadow-sm relative z-10 transition-transform active:scale-95">
@@ -105,10 +91,10 @@
             <span>👇</span> Siapa yang tangkap kucing ini? <span>👇</span>
         </label>
         <div class="grid grid-cols-2 gap-3 relative">
-            <button id="btn-player-pawis" onclick="selectPlayer('Pawis')" class="py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-orange-400 text-white border-orange-400 shadow-md transform scale-100">
+            <button id="btn-player-pawis" onclick="selectPlayer('Pawis')" class="py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-orange-400 text-white border-orange-400 shadow-md">
                 Pawis 🙋‍♂️
             </button>
-            <button id="btn-player-meyku" onclick="selectPlayer('Meyku')" class="py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-white text-rose-400 border-rose-200 hover:bg-rose-50 scale-95 opacity-80">
+            <button id="btn-player-meyku" onclick="selectPlayer('Meyku')" class="py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-white text-rose-400 border-rose-200 hover:bg-rose-50 opacity-80">
                 Meyku 🙋‍♀️
             </button>
         </div>
@@ -119,9 +105,9 @@
         <div class="cat-ears-container w-full">
             <div class="relative w-full aspect-[4/3] bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white mb-4">
                 
-                <div id="camera-notice" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-0 bg-slate-800">
+                <div id="camera-notice" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-20 bg-slate-800">
                     <div class="text-4xl mb-3 animate-pulse">📷</div>
-                    <p class="text-white font-bold text-sm mb-3" id="status-text">Mencari kucing...</p>
+                    <p class="text-white font-bold text-sm mb-3" id="status-text">Mencari kamera...</p>
                     <button onclick="initCamera()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs px-5 py-2.5 rounded-full shadow-lg transition-transform active:scale-95">
                         Nyalakan Kamera 🐾
                     </button>
@@ -134,10 +120,10 @@
                     </div>
                 </div>
 
-                <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover relative z-10"></video>
+                <video id="webcam" autoplay playsinline muted class="w-full h-full object-cover relative z-0"></video>
                 <canvas id="canvas" class="hidden"></canvas>
 
-                <!-- Animasi Loading Cute -->
+                <!-- Animasi Loading -->
                 <div id="ai-loading" class="hidden absolute inset-0 bg-white/95 z-30 flex flex-col items-center justify-center p-4 text-center backdrop-blur-sm">
                     <div class="text-6xl mb-3 animate-bounce">🙀</div>
                     <p class="text-pink-600 font-extrabold text-lg tracking-wide">Meow! Sedang Upload...</p>
@@ -176,6 +162,7 @@
         </section>
     </main>
 
+    <!-- LOGIKA JAVASCRIPT -->
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqtjF4VGLBZca5Ir2UYqIHpRb-VqmtndYI6DtwD8FZMd34rrzziDaWzudDY3FHNzxM/exec";
 
@@ -192,11 +179,11 @@
             const btnMeyku = document.getElementById('btn-player-meyku');
 
             if (player === 'Pawis') {
-                btnPawis.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-orange-400 text-white border-orange-400 shadow-md transform scale-100 opacity-100";
-                btnMeyku.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-white text-rose-400 border-rose-200 hover:bg-rose-50 transform scale-95 opacity-80";
+                btnPawis.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-orange-400 text-white border-orange-400 shadow-md";
+                btnMeyku.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-white text-rose-400 border-rose-200 hover:bg-rose-50 opacity-80";
             } else {
-                btnMeyku.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-rose-500 text-white border-rose-500 shadow-md transform scale-100 opacity-100";
-                btnPawis.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-white text-orange-400 border-orange-200 hover:bg-orange-50 transform scale-95 opacity-80";
+                btnMeyku.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-rose-500 text-white border-rose-500 shadow-md";
+                btnPawis.className = "py-2.5 rounded-2xl text-sm font-extrabold border-2 transition-all bg-white text-orange-400 border-orange-200 hover:bg-orange-50 opacity-80";
             }
         }
 
@@ -227,7 +214,6 @@
                     const card = document.createElement('div');
                     card.className = "card-polaroid rounded-[1.5rem] p-3 border-2 border-white flex flex-col justify-between relative overflow-hidden";
                     
-                    // Ornamen kecil di tiap foto berdasarkan player
                     const playerIcon = item.player.toLowerCase() === 'pawis' ? '😼' : '😻';
                     const playerColor = item.player.toLowerCase() === 'pawis' ? 'text-orange-500' : 'text-rose-500';
                     const bgColor = item.player.toLowerCase() === 'pawis' ? 'bg-orange-50' : 'bg-rose-50';
@@ -236,7 +222,7 @@
                         <div class="${bgColor} absolute -top-10 -right-10 w-20 h-20 rounded-full z-0 opacity-50"></div>
                         <div class="relative z-10">
                             <div class="relative mb-3">
-                                <img src="${item.imgSrc}" class="w-full aspect-square object-cover rounded-2xl bg-pink-100 shadow-inner" loading="lazy">
+                                <img src="${item.imgSrc !== '-' ? item.imgSrc : 'https://via.placeholder.com/150?text=Kucu'}" class="w-full aspect-square object-cover rounded-2xl bg-pink-100 shadow-inner" loading="lazy">
                                 <span class="absolute -bottom-2 -right-2 bg-gradient-to-r from-emerald-400 to-emerald-500 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-lg border-2 border-white">
                                     +${item.pts}
                                 </span>
@@ -270,19 +256,27 @@
             const result = catTypes[Math.floor(Math.random() * catTypes.length)];
             const noteText = document.getElementById('note-input').value || "Mendapat Kucing Baru! 🐾";
 
+            // Metadata dikirim via URL Query String
             const uploadUrl = `${GOOGLE_SCRIPT_URL}?action=addPhoto&player=${encodeURIComponent(activePlayer)}&pts=${result.pts}&label=${encodeURIComponent(result.label)}&tag=${encodeURIComponent(result.tag)}&note=${encodeURIComponent(noteText)}`;
 
             try {
-                await fetch(uploadUrl, {
+                const response = await fetch(uploadUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: imageData
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: imageData // Base64 foto dikirim di Body
                 });
 
-                document.getElementById('note-input').value = "";
-                setTimeout(fetchCloudData, 3500);
+                const resData = await response.json();
+
+                if (resData.status === "success") {
+                    document.getElementById('note-input').value = "";
+                    fetchCloudData();
+                } else {
+                    alert("Gagal: " + resData.message);
+                }
             } catch (e) {
+                console.error("Upload Error:", e);
                 alert("Gagal mengunggah foto ke cloud.");
             } finally {
                 aiLoading.classList.add('hidden');
@@ -299,27 +293,26 @@
                 statusText.innerText = "Kamera Siap!";
                 document.getElementById('camera-notice').style.display = 'none';
             } catch (err) {
-                statusText.innerText = "Kamera terblokir. Gunakan tombol File!";
+                statusText.innerText = "Kamera terblokir. Gunakan tombol Pilih Foto!";
             }
         }
 
-        async function captureCat() {
+        function captureCat() {
             if (!video.srcObject) {
-                alert("Kamera belum aktif. Pakai tombol Folder di bawah ya! 🐾");
+                alert("Kamera belum aktif. Pakai tombol '📁 Atau Pilih Foto dari Galeri HP' di bawah ya! 🐾");
                 return;
             }
 
             const context = canvas.getContext('2d');
-            canvas.width = 300; 
-            canvas.height = 300; // Dibuat kotak agar estetik
+            canvas.width = 400; 
+            canvas.height = 400;
             
-            // Perhitungan Crop Tengah agar tidak gepeng
             const minDim = Math.min(video.videoWidth, video.videoHeight);
             const startX = (video.videoWidth - minDim) / 2;
             const startY = (video.videoHeight - minDim) / 2;
             
             context.drawImage(video, startX, startY, minDim, minDim, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL('image/jpeg', 0.5); 
+            const imageData = canvas.toDataURL('image/jpeg', 0.6); 
 
             processCatPhoto(imageData);
         }
@@ -333,119 +326,20 @@
                 const img = new Image();
                 img.onload = function() {
                     const context = canvas.getContext('2d');
-                    canvas.width = 300;
-                    canvas.height = 300;
+                    canvas.width = 400;
+                    canvas.height = 400;
                     
                     const minDim = Math.min(img.width, img.height);
                     const startX = (img.width - minDim) / 2;
                     const startY = (img.height - minDim) / 2;
-<body>
-
-  <h2 style="text-align: center;">Upload Kucu Game</h2>
-
-  <div class="card">
-    <label>Pilih Player:</label>
-    <select id="playerInput">
-      <option value="Pawis">Pawis</option>
-      <option value="Meyku">Meyku</option>
-    </select>
-
-    <label>Poin (+):</label>
-    <input type="number" id="ptsInput" value="10">
-
-    <label>Label Foto:</label>
-    <input type="text" id="labelInput" placeholder="Contoh: Kucing Tidur">
-
-    <label>Tag:</label>
-    <input type="text" id="tagInput" placeholder="Contoh: Cat">
-
-    <label>Catatan:</label>
-    <textarea id="noteInput" placeholder="Keterangan singkat..."></textarea>
-
-    <label>Ambil Foto:</label>
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" onchange="handleFileSelect(event)">
-    <img id="preview" alt="Preview Foto">
-
-    <button id="uploadBtn" onclick="submitData()" disabled>Kirim Foto & Tambah Poin</button>
-  </div>
-
-  <p id="status"></p>
-
-  <script>
-    // MASUKKAN URL WEB APP APPS SCRIPT KAMU DI SINI
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycb.../exec"; 
-
-    let selectedBase64 = "";
-
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        selectedBase64 = e.target.result;
-        const preview = document.getElementById('preview');
-        preview.src = selectedBase64;
-        preview.style.display = 'block';
-        document.getElementById('uploadBtn').disabled = false;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function submitData() {
-      const statusText = document.getElementById('status');
-      const uploadBtn = document.getElementById('uploadBtn');
-
-      if (!selectedBase64) {
-        alert("Silakan jepret foto terlebih dahulu!");
-        return;
-      }
-
-      statusText.innerText = "Mengirim data ke Google...";
-      statusText.style.color = "#007bff";
-      uploadBtn.disabled = true;
-
-      // 1. Masukkan semua metadata ke URL Parameter
-      const params = new URLSearchParams({
-        action: "addPhoto",
-        player: document.getElementById('playerInput').value,
-        pts: document.getElementById('ptsInput').value,
-        label: document.getElementById('labelInput').value || "Kucing",
-        tag: document.getElementById('tagInput').value || "General",
-        note: document.getElementById('noteInput').value || "-"
-      });
-
-      const fullUrl = `${SCRIPT_URL}?${params.toString()}`;
-
-      try {
-        // 2. Kirim Request
-        const response = await fetch(fullUrl, {
-          method: "POST",
-          mode: "cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: selectedBase64 // File foto mentah Base64 di Body
-        });
 
                     context.drawImage(img, startX, startY, minDim, minDim, 0, 0, canvas.width, canvas.height);
-                    const imageData = canvas.toDataURL('image/jpeg', 0.5);
+                    const imageData = canvas.toDataURL('image/jpeg', 0.6);
                     processCatPhoto(imageData);
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-        const result = await response.json();
-
-        if (result.status === "success") {
-          statusText.innerText = "Berhasil! Poin bertambah & foto tersimpan di Sheet.";
-          statusText.style.color = "green";
-          document.getElementById('preview').style.display = 'none';
-          document.getElementById('labelInput').value = "";
-          document.getElementById('noteInput').value = "";
-          selectedBase64 = "";
-        } else {
-          statusText.innerText = "Gagal: " + result.message;
-          statusText.style.color = "red";
-          uploadBtn.disabled = false;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -454,13 +348,5 @@
             setInterval(fetchCloudData, 4000);
         });
     </script>
-      } catch (err) {
-        console.error("Error:", err);
-        statusText.innerText = "Terjadi kesalahan koneksi.";
-        statusText.style.color = "red";
-        uploadBtn.disabled = false;
-      }
-    }
-  </script>
 </body>
 </html>
